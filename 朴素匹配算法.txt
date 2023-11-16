@@ -1,0 +1,30 @@
+/*
+  朴素匹配算法 
+  @T 模式串
+  @S 文本串 
+*/ 
+void BF(char *S, char *T) 
+{
+	int i = 0;
+	int j = 0;
+	int slen=strlen(S);//长字符串S的长度 
+	int tlen=strlen(T);//子字符串T的长度 
+	
+	while(i < slen && j < tlen)//大于子字符串长度跳出循环 
+	{
+		if(S[i] == T[j])//匹配成功 
+		{
+			i++;
+			j++;
+		}
+		else
+		{
+			i = i - j + 1; //长字符串回到下一个位置 
+			j = 0;//返回子字符串首位 
+		} 
+	}
+	if(j = tlen)//子字符串判满 
+		printf("朴素匹配算法:\t匹配成功! 从文本串的第%d个位置开始匹配！\n", i-j); 
+	else
+		printf("匹配失败!"); 
+} 

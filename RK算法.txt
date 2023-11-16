@@ -1,0 +1,78 @@
+/*参数说明
+*********************
+T:要查找的字符串
+P:模式字符串
+*********************
+*/
+const int seed = 31; 
+int hash(char s[], int len) //求出P和T各个子串的哈希值
+{
+	int hash = 0;
+	int i ;
+	for (i = 0; i < len; i++)
+	{
+		hash = seed * hash + s[i];
+	}
+	return hash;
+}
+
+int num(int m) //计算seed的n次方
+{
+	int number = 1;
+	int i;
+	for ( i = 0; i < m; i++)
+	{
+		number *= seed;
+	}
+	return number;
+}
+
+long long* hash2(char s1[], char s2[], int m, int n) //哈希滚动
+{
+	long long* hash_s2 = (long long*)malloc(sizeof(long long)*(n - m + 1)); //动态内存分配
+	hash_s2[0] = hash(s2, m);
+	int i;
+	for (i = m; i < n; i++)
+	{
+		char news = s2[i];
+		char old = s2[i - m];
+		//前n个字符的哈希*seed-前n字符的第一个字符*seed的n次方再+新字符
+		int v = (hash_s2[i - m] * seed) - (num(m)*old) + news;
+		hash_s2[i - m + 1] = v;
+	}
+	return hash_s2;
+}
+
+/*
+  RK算法匹配 
+  @s1 文本串 
+  @s2 模式串
+  @m  文本串长度 
+  @n 模式串长度 
+*/ 
+void match(char s1[], char s2[], int m, int n)
+{
+	long long hash_s1 = hash(s1, m);
+	long long* hash_s2 = hash2(s1, s2, m, n);
+	int q = 1; //控制
+	int i, j;
+	for (i = 0; i < n - m + 1; i++)
+	{
+		if (hash_s2[i] == hash_s1)
+		{
+			for (j = i; j < i + m; j++) //哈希有极小概率发生冲突100000个大概冲突在0~3之间
+			{
+				if (s1[j - i] != s2[j])
+				{
+					q = 0;
+				}
+			}
+			if (q)
+			{
+				printf("%d\n", i++); //输出开头下标
+			}
+		}
+	}
+	free(hash_s2);
+}
+

@@ -1,0 +1,137 @@
+基于回溯法实现KMP算法
+
+/*
+  @pat 模式串
+  @text 文本串 
+  @next 状态转移数组 
+*/ 
+int KMP(char * text, char *pat, int next[])
+/* 初始条件：状态转移数组next，文本串，模式串已存在
+   操作结果：利用next数组对文本串进行模式串匹配
+    若匹配成功，则返回从文本串的第几个位置进行匹配
+	若匹配失败，则返回-1 
+*/ 
+{
+	// 指向文本串下标 
+	int i = 0;
+	// 指向模式串下标 
+	int j = 0;
+	// 文本串的长度 
+	int textLength = strlen(text);
+	// 模式串的长度 
+	int patLength =  strlen(pat);
+		
+	// 开始匹配 
+	while (i < textLength && j < patLength)
+	{
+		// 匹配成功或者j为-1 
+		if ( j == -1 || text[i] == pat[j])
+		{
+			i++;
+			j++;
+		}
+		// 失配 
+		else
+		{
+			j = next[j];
+		}
+	}
+	
+	// j的值等于模式串长度即代表匹配成功 
+	if ( j == strlen(pat))
+	{
+		printf("KMP算法: \t匹配成功! 从文本串的第%d个位置开始匹配！\n", i - j); 
+	}
+	// 匹配失败 
+	else
+	{
+		printf("匹配失败!\n"); 
+	}
+}
+
+/*
+  @pat 模式串
+  @next 状态转移数组 
+*/ 
+void getNext(char * pat, int *next)
+/* 初始条件：状态转移数组next，模式串已存在
+   操作结果：根据模式串构造next数组 
+*/  
+{
+	// next数组初始化 
+	next[0] = -1;
+	// 指向文本串下标 
+	int i = 0;
+	// 指向模式串下标 
+	int j = -1;
+	
+	// 构造next数组 
+	while(i < strlen(pat))
+	{
+		// 匹配成功 或 j = -1 
+		if (j == -1 || pat[i] == pat[j] )
+		{
+			j++;
+			i++;
+			next[i] = j; 
+		}
+		// 失配 
+		else
+		{
+			j = next[j];
+		}
+	}
+	//防止模式串有连续多个不匹配的字符 
+	for(i = 1; pat[i]; i++) {
+        j = next[i];
+        while(j && (pat[j] == pat[i])) {
+            j = next[j];
+        }
+        next[i] = j;
+    }
+}
+
+
+
+基于确定有限状态自动机实现KMP算法
+
+public stateShiftTbale(String pat)
+    { // 由模式字符串构造状态转移表
+      // pat 为模式串
+        int M = pat.length();
+        int R = 256;
+        dp = new int[M][R];
+        dp[0][pat.charAt(0)] = 1;
+        int X = 0;  // 重启状态初始化
+        for (int j = 1; j < M; j++)
+        { // 从状态1开始构建
+            for (int c = 0; c < R; c++) {
+                // 复制匹配失败情况下的值
+                dp[j][c] = dp[X][c];
+            }
+            // 设置匹配成功情况下的值
+            dp[j][pat.charAt(j)] = j+1;
+            // 更新重启状态
+            X = dp[X][pat.charAt(j)];
+        }
+    }
+
+public int search(String txt) {
+    // pat为模式串 txt为文本串
+    int M = pat.length();
+    int N = txt.length();
+    // pat 的初始态为 0
+    int j = 0;
+    for (int i = 0; i < N; i++) {
+        // 当前是状态 j，遇到字符 txt[i]，
+        // 根据dp数组转移到相应的位置
+        j = dp[j][txt.charAt(i)];
+        // 如果达到终止态，即模式串的结尾，返回匹配开头的下标
+        if (j == M) {
+            return i - M + 1;
+        }
+    }
+    // 没到达终止态，即到达文本串尾，匹配失败
+    return -1;
+}
+
